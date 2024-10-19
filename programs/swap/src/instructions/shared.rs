@@ -1,5 +1,7 @@
 use anchor_lang::prelude::*;
-use anchor_spl::{token::{ transfer_checked, Mint, TransferChecked}, token_interface::{TokenAccount, TokenInterface}};
+use anchor_spl::token_interface::{
+    transfer_checked, Mint, TokenAccount, TokenInterface, TransferChecked,
+};
 
 pub fn transfer_tokens<'info>(
     from: &InterfaceAccount<'info, TokenAccount>,   // InterfaceAccount is used for program to work on both old token program
