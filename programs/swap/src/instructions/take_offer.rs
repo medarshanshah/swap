@@ -5,10 +5,7 @@ use anchor_spl::{
         TransferChecked,}
 };
 
-
-use crate::{Offer, ANCHOR_DISCRIMINATOR};
-
-use super::MakeOffer;
+use crate::{Offer};
 
 pub struct TakeOffer<'info> {
     #[account(mut)]
