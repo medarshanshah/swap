@@ -4,6 +4,7 @@ use anchor_spl::{
     token_interface::{Mint, TokenAccount, TokenInterface},
 };
 
+
 use crate::{Offer, ANCHOR_DISCRIMINATOR};
 
 use super::transfer_tokens;
@@ -12,10 +13,10 @@ use super::transfer_tokens;
 #[instruction(id: u64)]
 pub struct MakeOffer<'info> {
     #[account(mut)]
-    pub maker: Signer<'info>,
+    pub maker: Signer<'info>,       // The maker will pay for the transaction, hence account is mutable
 
-    #[account(mint::token_program = token_program)]
-    pub token_mint_a: InterfaceAccount<'info, Mint>,
+    #[account(mint::token_program = token_program)]     //
+    pub token_mint_a: InterfaceAccount<'info, Mint>,    //
 
     #[account(mint::token_program = token_program)]
     pub token_mint_b: InterfaceAccount<'info, Mint>,
@@ -40,8 +41,9 @@ pub struct MakeOffer<'info> {
     #[account(
         init,
         payer = maker,
-        associated_token::mint = token_mint_a,
-        associated_token::authority = offer,
+        associated_token::mint = token_mint_a,  //Token account's mint is token_mint_a
+         // This token account is not owned by maker but Offer PDA. Each individual vault's authority will be offer account.
+        associated_token::authority = offer,  // it will sign for things to move things in and out of the vault
         associated_token::token_program = token_program
     )]
     pub vault: InterfaceAccount<'info, TokenAccount>,
@@ -52,7 +54,7 @@ pub struct MakeOffer<'info> {
 }
 
 pub fn send_offered_tokens_to_vault(
-    context: &Context<MakeOffer>,
+    context: &Context<MakeOffer>,       // context of MakeOffer only borrowed because we don't need to write to it
     token_a_offered_amount: u64,
 ) -> Result<()> {
     transfer_tokens(
@@ -71,7 +73,7 @@ pub fn save_offer(context: Context<MakeOffer>, id: u64, token_b_wanted_amount: u
         maker: context.accounts.maker.key(),
         token_mint_a: context.accounts.token_mint_a.key(),
         token_mint_b: context.accounts.token_mint_b.key(),
-        token_b_wanted_amount,
+        token_b_wanted_amount,      //  how many tokens wanted in exchange
         bump: context.bumps.offer,
     });
     Ok(())

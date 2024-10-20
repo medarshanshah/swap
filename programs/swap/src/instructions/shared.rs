@@ -24,6 +24,6 @@ pub fn transfer_tokens<'info>(
 
     //Transferring tokens is done by calling the transfer_checked function of tokens program. 
     // It has some logic to verify mints and a bunch of useful safety features
-    transfer_checked(cpi_context, *amount, mint.decimals);
+    let _ = transfer_checked(cpi_context, *amount, mint.decimals);
     Ok(())
 }
