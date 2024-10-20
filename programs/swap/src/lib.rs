@@ -30,7 +30,7 @@ pub mod swap {
     //Instrution handler: take_offer
     // This allows somebody to take the tokens from the vault and also sens their tokens directly to the person that made the offer
     pub fn take_offer(context: Context<TakeOffer>) -> Result<()> {
-        instructions::take_offer::send_wanted_tokens_to_maker(context)?;
+        instructions::take_offer::send_wanted_tokens_to_maker(&context)?;
         instructions::take_offer::withdraw_and_close_vault(context)
     }
 }

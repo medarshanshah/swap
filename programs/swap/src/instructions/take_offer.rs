@@ -5,8 +5,11 @@ use anchor_spl::{
         TransferChecked,}
 };
 
-use crate::{Offer};
+use crate::Offer;
 
+use super::transfer_tokens;
+
+#[derive(Accounts)]
 pub struct TakeOffer<'info> {
     #[account(mut)]
     pub taker: Signer<'info>,
@@ -26,7 +29,7 @@ pub struct TakeOffer<'info> {
         associated_token::authority = taker,    // authority is account level owner
         associated_token::token_program = token_program
     )]
-    pub taker_token_account_a: Box<InterfaceAccount<'info, TokenAccount>>   //tokens from vault will be put to takers's token account a
+    pub taker_token_account_a: Box<InterfaceAccount<'info, TokenAccount>>,   //tokens from vault will be put to takers's token account a
 
     #[account(
         mut,  
@@ -34,7 +37,7 @@ pub struct TakeOffer<'info> {
         associated_token::authority = taker,    // authority is account level owner
         associated_token::token_program = token_program
     )]
-    pub taker_token_account_b: Box<InterfaceAccount<'info, TokenAccount>>   //tokens from vault will be put to takers's token account b
+    pub taker_token_account_b: Box<InterfaceAccount<'info, TokenAccount>>,   //tokens from vault will be put to takers's token account b
 
     #[account(
         init_if_needed,
@@ -43,7 +46,7 @@ pub struct TakeOffer<'info> {
         associated_token::authority = maker,    // maker since it is maker's token_account,authority is account level owner
         associated_token::token_program = token_program
     )]
-    pub maker_token_account_b: Box<InterfaceAccount<'info, TokenAccount>>
+    pub maker_token_account_b: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
         mut,            // mutable since the account should be closed once offer is taken
@@ -54,7 +57,7 @@ pub struct TakeOffer<'info> {
         seeds = [b"offer", maker.key().as_ref(), offer.id.to_le_bytes().as_ref()],
         bump = offer.bump
     )]
-    pub offer: Account<'info, Offer>
+    pub offer: Account<'info, Offer>,
 
     #[account(
         mut,    // mutable since all the tokens will be taken out and given to the taker
@@ -62,7 +65,7 @@ pub struct TakeOffer<'info> {
         associated_token::authority = offer,    // neither be maker or taker, controlled by the offer account
         associated_token::token_program = token_program
     )]
-    pub vault: InterfaceAccount<'info, TokenAccount>
+    pub vault: InterfaceAccount<'info, TokenAccount>,
 
     pub system_program: Program<'info, System>,
     pub token_program: Interface<'info, TokenInterface>,
@@ -100,7 +103,7 @@ pub fn withdraw_and_close_vault(context: Context<TakeOffer>) -> Result<()> {
         to: context.accounts.taker_token_account_a.to_account_info(),   // to is taker, because we take the tokens from the vult and put them in taker's token account a because the token in the vault are of type token a
         mint: context.accounts.token_mint_a.to_account_info(),          
         authority: context.accounts.offer.to_account_info(),
-    }
+    };
 
     let cpi_context = CpiContext::new_with_signer(
         context.accounts.token_program.to_account_info(),   // Combining the token program, 
